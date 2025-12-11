@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/black"
+    style="@style/VisibleScrollbar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp">
+
+        <FrameLayout
+            android:id="@+id/framePreview"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:background="@color/component_gray">
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/previewView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"/>
+
+            <ImageView
+                android:id="@+id/ivFace"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:contentDescription="Face Preview" />
+        </FrameLayout>
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Name"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etRoll"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Roll Number"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etEnrollmentNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Enrollment Number"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etBranch"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Branch"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etSemester"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Semester"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etSubjectName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Subject Name"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
+            android:background="@color/component_gray"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:hint="Subject Type"
+            android:textColorHint="@color/light_gray"
+            app:boxBackgroundColor="@color/component_gray">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvSubjectType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/white"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnCamera"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Camera"
+                android:background="@drawable/gradient_button_background"
+                app:backgroundTint="@null"
+                android:layout_marginEnd="4dp"
+                android:textColor="@color/white"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp"/>
+
+            <Button
+                android:id="@+id/btnGallery"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Gallery"
+                android:background="@drawable/gradient_button_background"
+                app:backgroundTint="@null"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/white"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Register Student"
+            android:background="@drawable/gradient_button_background"
+            app:backgroundTint="@null"
+            android:textColor="@color/white"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/btnExportClear"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Export &amp; Clear"
+            android:background="@drawable/gradient_button_background"
+            app:backgroundTint="@null"
+            android:textColor="@color/white"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</ScrollView>

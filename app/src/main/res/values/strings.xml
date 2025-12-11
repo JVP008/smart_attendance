@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Smart Attendance</string>
+    <string name="menu_register">Register</string>
+    <string name="menu_attendance">Attendance</string>
+    <string name="menu_students">Students</string>
+    <string name="menu_attendance_history">Attendance History</string>
+    <string-array name="attendance_types">
+        <item>Practical</item>
+        <item>Theory</item>
+    </string-array>
+</resources>

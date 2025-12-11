@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="VisibleScrollbar">
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:scrollbarThumbVertical">@color/light_gray</item>
+        <item name="android:fadeScrollbars">false</item>
+    </style>
+</resources>

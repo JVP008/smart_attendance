@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:background="@color/component_gray" />
+
+    <TextView
+        android:id="@+id/tvFeedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/previewView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Show your face to mark attendance"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:scrollHorizontally="true"/>
+
+    <EditText
+        android:id="@+id/etEnrollmentForAttendance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvFeedback"
+        android:layout_margin="16dp"
+        android:hint="Enter Enrollment Number"
+        android:textColorHint="@color/light_gray"
+        android:textColor="@color/white"
+        android:background="@color/component_gray"
+        android:padding="12dp"
+        android:inputType="textPersonName"
+        android:minHeight="48dp" />
+
+    <Button
+        android:id="@+id/btnCaptureAttendance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etEnrollmentForAttendance"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/gradient_button_background"
+        app:backgroundTint="@null"
+        android:textColor="@color/white"
+        android:text="Capture Face" />
+
+    <ImageView
+        android:id="@+id/ivCapturedFace"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/btnCaptureAttendance"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:background="@color/component_gray"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnRecognizeFace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivCapturedFace"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/gradient_button_background"
+        app:backgroundTint="@null"
+        android:textColor="@color/white"
+        android:text="Recognize Face"
+        android:visibility="gone" />
+
+</RelativeLayout>
