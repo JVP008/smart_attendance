@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smart_attendance.databinding.FragmentStudentsBinding
 import com.example.smart_attendance.ui.adapters.StudentAdapter
 import com.example.smart_attendance.ui.viewmodels.StudentViewModel
-import com.example.smart_attendance.data.StudentSummary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,8 +28,8 @@ class StudentsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this).get(StudentViewModel::class.java)
-        adapter = StudentAdapter(emptyList<StudentSummary>()) { studentSummary ->
+        viewModel = ViewModelProvider(this)[StudentViewModel::class.java]
+        adapter = StudentAdapter(emptyList()) { studentSummary ->
             // Handle delete click here
             lifecycleScope.launch(Dispatchers.IO) {
                 val studentToDelete = viewModel.getStudentByEnrollment(studentSummary.enrollmentNumber)
@@ -48,6 +47,7 @@ class StudentsFragment : Fragment() {
         }
         binding.rvStudents.layoutManager = LinearLayoutManager(context)
         binding.rvStudents.adapter = adapter
+        binding.rvStudents.setHasFixedSize(true)
 
         viewModel.allStudents.observe(viewLifecycleOwner) { students ->
             adapter.updateData(students)

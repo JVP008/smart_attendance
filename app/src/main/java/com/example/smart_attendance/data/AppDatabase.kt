@@ -17,13 +17,13 @@ data class OfflineAttendance(
 @Dao
 interface OfflineAttendanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAttendance(attendance: OfflineAttendance)
+    suspend fun insertAttendance(attendance: OfflineAttendance): Long
 
     @Query("SELECT * FROM offline_attendance")
     fun getAllAttendance(): LiveData<List<OfflineAttendance>>
 
     @Query("DELETE FROM offline_attendance")
-    suspend fun clearAttendance()
+    suspend fun clearAttendance(): Int
 }
 
 @Database(entities = [Student::class, Attendance::class, OfflineAttendance::class], version = 11, exportSchema = false)

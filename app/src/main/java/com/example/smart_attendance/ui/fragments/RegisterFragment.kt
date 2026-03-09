@@ -84,9 +84,8 @@ class RegisterFragment : Fragment() {
         attendanceHistoryViewModel = ViewModelProvider(requireActivity())[AttendanceHistoryViewModel::class.java]
         attendanceViewModel = ViewModelProvider(this)[AttendanceViewModel::class.java]
         cameraExecutor = Executors.newSingleThreadExecutor()
-        if (allPermissionsGranted()) {
-            startCamera()
-        } else {
+        
+        if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
@@ -169,6 +168,34 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!isHidden && allPermissionsGranted()) {
+            startCamera()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopCamera()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            stopCamera()
+        } else if (allPermissionsGranted()) {
+            startCamera()
+        }
+    }
+
+    private fun stopCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraProviderFuture.addListener({
+            cameraProviderFuture.get().unbindAll()
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
@@ -216,11 +243,15 @@ class RegisterFragment : Fragment() {
     }
 
     private fun imageProxyToBitmap(imageProxy: androidx.camera.core.ImageProxy): Bitmap {
+        val rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat()
+        val matrix = android.graphics.Matrix().apply { postRotate(rotationDegrees) }
+        
         val buffer = imageProxy.planes[0].buffer
         val bytes = ByteArray(buffer.remaining())
         buffer.get(bytes)
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            }
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
 
     private fun showImageAndDetectFace(bitmap: Bitmap) {
         Log.d("RegisterFragment", "Attempting to detect face in bitmap: ${bitmap.width}x${bitmap.height}")
@@ -231,11 +262,13 @@ class RegisterFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 if (face != null) {
                     binding.ivFace.setImageBitmap(face)
+                    detectedFaceBitmap?.recycle()
                     detectedFaceBitmap = face
                     Log.d("RegisterFragment", "Face detected! Setting detectedFaceBitmap and image view.")
                     context?.let { Toast.makeText(it, "Face detected!", Toast.LENGTH_SHORT).show() }
                 } else {
                     binding.ivFace.setImageBitmap(bitmap)
+                    detectedFaceBitmap?.recycle()
                     detectedFaceBitmap = null
                     Log.d("RegisterFragment", "No face detected. Setting full bitmap to image view.")
                     context?.let { Toast.makeText(it, "No face detected. Please try another image.", Toast.LENGTH_SHORT).show() }
@@ -297,17 +330,7 @@ class RegisterFragment : Fragment() {
             }
 
             val student = Student(
-                name = name,
-                rollNo = rollNo,
-                enrollmentNumber = enrollmentNumber,
-                branch = branch,
-                semester = semester,
-                faceImagePath = faceImagePath,
-                faceEmbedding = faceEmbedding,
-                faceImageWidth = detectedFaceBitmap!!.width,
-                faceImageHeight = detectedFaceBitmap!!.height,
-                subjectName = subjectName,
-                attendanceType = attendanceType
+                name = name, rollNo = rollNo, enrollmentNumber = enrollmentNumber, branch = branch, semester = semester, faceImagePath = faceImagePath, faceEmbedding = faceEmbedding, faceImageWidth = detectedFaceBitmap!!.width, faceImageHeight = detectedFaceBitmap!!.height, subjectName = subjectName, attendanceType = attendanceType
             )
 
             (viewModel as StudentViewModel).insert(student)
@@ -364,7 +387,9 @@ class RegisterFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startCamera()
+                if (!isHidden) {
+                    startCamera()
+                }
             } else {
                 context?.let { Toast.makeText(it, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show() }
             }

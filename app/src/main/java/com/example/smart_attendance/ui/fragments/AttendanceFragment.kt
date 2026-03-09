@@ -57,9 +57,7 @@ class AttendanceFragment : Fragment() {
         binding.ivCapturedFace.visibility = View.GONE
         binding.btnRecognizeFace.visibility = View.GONE
 
-        if (allPermissionsGranted()) {
-            startCameraPreview()
-        } else {
+        if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
@@ -70,6 +68,34 @@ class AttendanceFragment : Fragment() {
         binding.btnRecognizeFace.setOnClickListener {
             handleRecognizeFace()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isHidden && allPermissionsGranted()) {
+            startCameraPreview()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopCamera()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            stopCamera()
+        } else if (allPermissionsGranted()) {
+            startCameraPreview()
+        }
+    }
+
+    private fun stopCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraProviderFuture.addListener({
+            cameraProviderFuture.get().unbindAll()
+        }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     private fun handleCaptureAttendance() {
@@ -269,7 +295,6 @@ class AttendanceFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         cameraExecutor.shutdown()
-        ProcessCameraProvider.getInstance(requireContext()).get().unbindAll()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -284,7 +309,9 @@ class AttendanceFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startCameraPreview()
+                if (!isHidden) {
+                    startCameraPreview()
+                }
             } else {
                 Toast.makeText(context, "Permissions not granted.", Toast.LENGTH_SHORT).show()
                 requireActivity().finish()

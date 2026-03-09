@@ -10,10 +10,10 @@ import androidx.room.Query
 @Dao
 interface StudentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(student: Student)
+    suspend fun insert(student: Student): Long
 
     @Delete
-    suspend fun delete(student: Student)
+    suspend fun delete(student: Student): Int
 
     @Query("SELECT name, enrollmentNumber, branch, semester, faceImagePath, subjectName, attendanceType FROM students")
     fun getAllStudents(): LiveData<List<StudentSummary>>

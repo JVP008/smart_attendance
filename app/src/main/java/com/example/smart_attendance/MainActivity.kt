@@ -86,38 +86,39 @@ class MainActivity : AppCompatActivity() {
 
         authenticateApp()
 
-        // Set up bottom navigation with fragments
+        // Set up bottom navigation with fragments for performance
         binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_register -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, RegisterFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_attendance -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, AttendanceFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_students -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, StudentsFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_attendance_history -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, AttendanceHistoryFragment())
-                        .commit()
-                    true
-                }
-                else -> false
+            val (tag, factory) = when (item.itemId) {
+                R.id.nav_register -> "register" to ::RegisterFragment
+                R.id.nav_attendance -> "attendance" to ::AttendanceFragment
+                R.id.nav_students -> "students" to ::StudentsFragment
+                R.id.nav_attendance_history -> "attendanceHistory" to ::AttendanceHistoryFragment
+                else -> null to null
             }
+
+            if (tag != null && factory != null) {
+                val transaction = supportFragmentManager.beginTransaction()
+                val currentVisibleFragment = supportFragmentManager.fragments.find { it.isVisible }
+                if (currentVisibleFragment != null) {
+                    transaction.hide(currentVisibleFragment)
+                }
+
+                var fragmentToShow = supportFragmentManager.findFragmentByTag(tag)
+                if (fragmentToShow == null) {
+                    fragmentToShow = factory()
+                    transaction.add(R.id.fragmentContainer, fragmentToShow, tag)
+                } else {
+                    transaction.show(fragmentToShow)
+                }
+                transaction.commit()
+            }
+            true
         }
-        // Default fragment
-        binding.bottomNav.selectedItemId = R.id.nav_register
+
+        // Set the default fragment only when the activity is first created.
+        if (savedInstanceState == null) {
+            binding.bottomNav.selectedItemId = R.id.nav_register
+        }
     }
 
     private fun authenticateApp() {

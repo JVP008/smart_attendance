@@ -9,18 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.smart_attendance.R
 import com.example.smart_attendance.data.AttendanceRecordDisplay
 import com.example.smart_attendance.databinding.FragmentAttendanceHistoryBinding
 import com.example.smart_attendance.ui.adapters.AttendanceAdapter
-import com.example.smart_attendance.ui.adapters.StudentAttendanceStatsAdapter
 import com.example.smart_attendance.ui.viewmodels.AttendanceHistoryViewModel
+import com.example.smart_attendance.ui.viewmodels.StudentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.asFlow
-import androidx.lifecycle.asFlow
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
@@ -31,13 +27,14 @@ class AttendanceHistoryFragment : Fragment() {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding get() = _binding!!
     private lateinit var attendanceHistoryViewModel: AttendanceHistoryViewModel
+    private lateinit var studentViewModel: StudentViewModel
     private lateinit var attendanceAdapter: AttendanceAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentAttendanceHistoryBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -46,21 +43,28 @@ class AttendanceHistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         attendanceHistoryViewModel = ViewModelProvider(this)[AttendanceHistoryViewModel::class.java]
+        studentViewModel = ViewModelProvider(this)[StudentViewModel::class.java]
         attendanceAdapter = AttendanceAdapter(emptyList())
 
         binding.rvAttendanceHistory.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = attendanceAdapter
+            setHasFixedSize(true)
         }
 
+        // Combine student data and attendance data efficiently
         attendanceHistoryViewModel.allAttendance.observe(viewLifecycleOwner) { attendanceList ->
             lifecycleScope.launch(Dispatchers.IO) {
+                // Fetch all students once to avoid N+1 queries
+                val studentSummaries = studentViewModel.allStudents.value ?: emptyList()
+                val studentMap = studentSummaries.associateBy { it.enrollmentNumber }
+
                 val displayList = attendanceList.map { attendance ->
-                    val student = attendanceHistoryViewModel.getStudentSummaryByEnrollmentNumber(attendance.studentEnrollmentNumber)
+                    val student = studentMap[attendance.studentEnrollmentNumber]
                     AttendanceRecordDisplay(
                         attendance.id,
                         student?.name ?: "Unknown Student",
-                        student?.enrollmentNumber ?: "N/A",
+                        student?.enrollmentNumber ?: attendance.studentEnrollmentNumber,
                         attendance.timestamp,
                         student?.subjectName ?: "N/A",
                         student?.attendanceType ?: "N/A",
@@ -82,12 +86,16 @@ class AttendanceHistoryFragment : Fragment() {
                     }
                     return@launch
                 }
+                
+                val studentSummaries = studentViewModel.allStudents.value ?: emptyList()
+                val studentMap = studentSummaries.associateBy { it.enrollmentNumber }
+                
                 val displayList = attendanceList.map { attendance ->
-                    val student = attendanceHistoryViewModel.getStudentSummaryByEnrollmentNumber(attendance.studentEnrollmentNumber)
+                    val student = studentMap[attendance.studentEnrollmentNumber]
                     AttendanceRecordDisplay(
                         attendance.id,
                         student?.name ?: "Unknown Student",
-                        student?.enrollmentNumber ?: "N/A",
+                        student?.enrollmentNumber ?: attendance.studentEnrollmentNumber,
                         attendance.timestamp,
                         student?.subjectName ?: "N/A",
                         student?.attendanceType ?: "N/A",
@@ -98,7 +106,6 @@ class AttendanceHistoryFragment : Fragment() {
                     val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                     val fileName = "attendance_${sdf.format(Date())}.csv"
                     val file = File(requireContext().getExternalFilesDir(null), fileName)
-                    val timestampFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
                     val dateFormat = SimpleDateFormat("MM-dd", Locale.getDefault())
                     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -129,4 +136,4 @@ class AttendanceHistoryFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-} 
+}

@@ -24,4 +24,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "smart_attendance"
 include(":app")
-
